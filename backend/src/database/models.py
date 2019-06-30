@@ -57,7 +57,6 @@ class Drink(db.Model):
         Short form representation of the Drink model
         :return:
         """
-        print(json.loads(self.recipe))
         short_recipe = [{'color': r['color'], 'parts': r['parts']} for r in json.loads(self.recipe)]
         return {
             'id': self.id,
