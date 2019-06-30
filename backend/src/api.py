@@ -1,7 +1,8 @@
 import json
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, abort
 from flask_cors import CORS
+from werkzeug.exceptions import HTTPException
 
 from .database.models import setup_db, Drink
 
@@ -14,11 +15,10 @@ CORS(app)
 !! NOTE THIS WILL DROP ALL RECORDS AND START YOUR DB FROM SCRATCH
 !! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
 '''
-
-
 # db_drop_and_create_all()
 
 
+# Routes
 @app.route('/drinks', methods=['GET'])
 def get_all_drinks():
     """
@@ -70,11 +70,7 @@ def update_drink(drink_id):
     """
     drink = Drink.query.get(drink_id)
     if not drink:
-        return jsonify({
-            'error': f'No drink found with id: {drink_id}',
-            'success': False,
-            'drinks': []
-        }), 404
+        return abort(404, f'No drink found with id: {drink_id}')
     drink.title = request.json['title'] if 'title' in request.json else drink.title
     drink.recipe = json.dumps(request.json['recipe']) if 'recipe' in request.json else drink.recipe
     drink.update()
@@ -93,11 +89,7 @@ def delete_drink(drink_id):
     """
     drink = Drink.query.get(drink_id)
     if not drink:
-        return jsonify({
-            'error': f'No drink found with id: {drink_id}',
-            'success': False,
-            'delete': None
-        }), 404
+        return abort(404, f'No drink found with id: {drink_id}')
     drink.delete()
     return jsonify({
         'success': True,
@@ -105,38 +97,16 @@ def delete_drink(drink_id):
     })
 
 
-# Error Handling
-'''
-Example error handling for unprocessable entity
-'''
-
-
-@app.errorhandler(422)
-def unprocessable(error):
+# Error Handler
+@app.errorhandler(HTTPException)
+def error_handler(error):
+    """
+    HTTP error handler for all endpoints
+    :param error: HTTPException containing code and description
+    :return: error: HTTP status code, message: Error description
+    """
     return jsonify({
         "success": False,
-        "error": 422,
-        "message": "unprocessable"
-    }), 422
-
-
-'''
-@TODO implement error handlers using the @app.errorhandler(error) decorator
-    each error handler should return (with approprate messages):
-             jsonify({
-                    "success": False, 
-                    "error": 404,
-                    "message": "resource not found"
-                    }), 404
-
-'''
-
-'''
-@TODO implement error handler for 404
-    error handler should conform to general task above 
-'''
-
-'''
-@TODO implement error handler for AuthError
-    error handler should conform to general task above 
-'''
+        "error": error.code,
+        "message": error.description
+    }), error.code
