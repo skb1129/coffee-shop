@@ -1,11 +1,9 @@
-import os
-from flask import Flask, request, jsonify, abort
-from sqlalchemy import exc
 import json
+
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 
-from .database.models import db_drop_and_create_all, setup_db, Drink
-from .auth.auth import AuthError, requires_auth
+from .database.models import setup_db, Drink
 
 app = Flask(__name__)
 setup_db(app)
@@ -16,6 +14,8 @@ CORS(app)
 !! NOTE THIS WILL DROP ALL RECORDS AND START YOUR DB FROM SCRATCH
 !! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
 '''
+
+
 # db_drop_and_create_all()
 
 
@@ -50,27 +50,38 @@ def add_drink():
     """
     Permission "post:drinks" endpoint: "/drinks"
     :json title: string, recipe: dict
-    :return: drinks: List containing newly created drink in short format
+    :return: drinks: List containing newly created drink in long format
     """
     drink = Drink(title=request.json['title'], recipe=json.dumps([request.json['recipe']]))
     drink.insert()
     return jsonify({
         'success': True,
-        'drinks': [drink.short()]
+        'drinks': [drink.long()]
     })
 
 
-'''
-@TODO implement endpoint
-    PATCH /drinks/<id>
-        where <id> is the existing model id
-        it should respond with a 404 error if <id> is not found
-        it should update the corresponding row for <id>
-        it should require the 'patch:drinks' permission
-        it should contain the drink.long() data representation
-    returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the updated drink
-        or appropriate status code indicating reason for failure
-'''
+@app.route('/drinks/<int:drink_id>', methods=['PATCH'])
+def update_drink(drink_id):
+    """
+    Permission "patch:drinks" endpoint: "/drinks/<id>"
+    :json title: string, recipe: dict
+    :param drink_id: Integer representing the drink to be updated
+    :return: drinks: List containing the updated drink in long format
+    """
+    drink = Drink.query.get(drink_id)
+    if not drink:
+        return jsonify({
+            'error': f'No drink found with id: {drink_id}',
+            'success': False,
+            'drinks': []
+        }), 404
+    drink.title = request.json['title'] if 'title' in request.json else drink.title
+    drink.recipe = json.dumps(request.json['recipe']) if 'recipe' in request.json else drink.recipe
+    drink.update()
+    return jsonify({
+        'success': True,
+        'drinks': [drink.long()]
+    })
 
 
 '''
@@ -84,18 +95,20 @@ def add_drink():
         or appropriate status code indicating reason for failure
 '''
 
-
 # Error Handling
 '''
 Example error handling for unprocessable entity
 '''
+
+
 @app.errorhandler(422)
 def unprocessable(error):
     return jsonify({
-                    "success": False,
-                    "error": 422,
-                    "message": "unprocessable"
-                    }), 422
+        "success": False,
+        "error": 422,
+        "message": "unprocessable"
+    }), 422
+
 
 '''
 @TODO implement error handlers using the @app.errorhandler(error) decorator
@@ -112,7 +125,6 @@ def unprocessable(error):
 @TODO implement error handler for 404
     error handler should conform to general task above 
 '''
-
 
 '''
 @TODO implement error handler for AuthError
