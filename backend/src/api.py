@@ -4,7 +4,7 @@ from flask import Flask, request, jsonify, abort
 from flask_cors import CORS
 from werkzeug.exceptions import HTTPException
 
-from .database.models import setup_db, Drink
+from .database.models import setup_db, Drink, db_drop_and_create_all
 
 app = Flask(__name__)
 setup_db(app)
