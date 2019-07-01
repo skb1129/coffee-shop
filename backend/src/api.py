@@ -99,14 +99,28 @@ def delete_drink(drink_id):
 
 # Error Handler
 @app.errorhandler(HTTPException)
-def error_handler(error):
+def http_exception_handler(error):
     """
     HTTP error handler for all endpoints
     :param error: HTTPException containing code and description
     :return: error: HTTP status code, message: Error description
     """
     return jsonify({
-        "success": False,
-        "error": error.code,
-        "message": error.description
+        'success': False,
+        'error': error.code,
+        'message': error.description
     }), error.code
+
+
+@app.errorhandler(Exception)
+def exception_handler(error):
+    """
+    Generic error handler for all endpoints
+    :param error: Any exception
+    :return: error: Exception instance
+    """
+    return jsonify({
+        'success': False,
+        'error': 500,
+        'message': f'Something went wrong: {error}'
+    }), 500
