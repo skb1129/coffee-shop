@@ -4,7 +4,8 @@ from flask import Flask, request, jsonify, abort
 from flask_cors import CORS
 from werkzeug.exceptions import HTTPException
 
-from .database.models import setup_db, Drink, db_drop_and_create_all
+from .auth.auth import requires_auth, AuthError
+from .database.models import setup_db, Drink
 
 app = Flask(__name__)
 setup_db(app)
@@ -15,6 +16,8 @@ CORS(app)
 !! NOTE THIS WILL DROP ALL RECORDS AND START YOUR DB FROM SCRATCH
 !! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
 '''
+
+
 # db_drop_and_create_all()
 
 
@@ -33,6 +36,7 @@ def get_all_drinks():
 
 
 @app.route('/drinks-detail', methods=['GET'])
+@requires_auth('get:drinks-detail')
 def get_all_drinks_detail():
     """
     Permission "get:drinks-detail" endpoint: "/drinks-detail"
@@ -46,6 +50,7 @@ def get_all_drinks_detail():
 
 
 @app.route('/drinks', methods=['POST'])
+@requires_auth('post:drinks')
 def add_drink():
     """
     Permission "post:drinks" endpoint: "/drinks"
@@ -61,6 +66,7 @@ def add_drink():
 
 
 @app.route('/drinks/<int:drink_id>', methods=['PATCH'])
+@requires_auth('patch:drinks')
 def update_drink(drink_id):
     """
     Permission "patch:drinks" endpoint: "/drinks/<id>"
@@ -81,6 +87,7 @@ def update_drink(drink_id):
 
 
 @app.route('/drinks/<int:drink_id>', methods=['DELETE'])
+@requires_auth('delete:drinks')
 def delete_drink(drink_id):
     """
     Permission "delete:drinks" endpoint: "/drinks/<id>"
@@ -117,10 +124,22 @@ def exception_handler(error):
     """
     Generic error handler for all endpoints
     :param error: Any exception
-    :return: error: Exception instance
+    :return: error: HTTP status code, message: Error description
     """
     return jsonify({
         'success': False,
         'error': 500,
         'message': f'Something went wrong: {error}'
     }), 500
+
+
+@app.errorhandler(AuthError)
+def auth_error_handler(error):
+    """
+    Authentication error handler for scoped endpoints
+    :param error: AuthError instance
+    :return: error: HTTP status code, message: Error description
+    """
+    response = jsonify(error.error)
+    response.status_code = error.status_code
+    return response

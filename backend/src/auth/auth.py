@@ -15,7 +15,6 @@ class AuthError(Exception):
     AuthError Exception
     A standardized way to communicate Authentication failures
     """
-
     def __init__(self, error, status_code):
         self.error = error
         self.status_code = status_code
@@ -55,27 +54,23 @@ def get_token_auth_header():
     return token
 
 
-'''
-@TODO implement check_permissions(permission, payload) method
-    @INPUTS
-        permission: string permission (i.e. 'post:drink')
-        payload: decoded jwt payload
-
-    it should raise an AuthError if permissions are not included in the payload
-        !!NOTE check your RBAC settings in Auth0
-    it should raise an AuthError if the requested permission string is not in the payload permissions array
-    return true otherwise
-'''
-
-
 def check_permissions(permission, payload):
     """
     Checks if the permissions are included in the payload
     :param permission: Required permission
     :param payload: Decoded JWT
     """
-    print(permission)
-    print(payload)
+    if 'permissions' not in payload or not payload.get('permissions'):
+        raise AuthError({
+            'code': 'invalid_header',
+            'description': 'Permissions not specified in the token'
+        }, 401)
+    if permission not in payload.get('permissions'):
+        raise AuthError({
+            'code': 'unauthorised',
+            'description': 'Required permissions not available in the token'
+        }, 401)
+    return True
 
 
 def verify_decode_jwt(token):
@@ -158,7 +153,7 @@ def requires_auth(permission=''):
             token = get_token_auth_header()
             payload = verify_decode_jwt(token)
             check_permissions(permission, payload)
-            return f(payload, *args, **kwargs)
+            return f(*args, **kwargs)
 
         return wrapper
 
