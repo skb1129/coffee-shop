@@ -1,35 +1,91 @@
-# Coffee Shop Full Stack
+# Coffee Shop
 
-## Full Stack Nano - IAM Final Project
+Coffee Shop is a full stack project, part of Udacity's Full Stack Nanodegree. The server for this application is build
+in Python using Flask. The client app is build using Ionic and Angular.
 
-Udacity has decided to open a new digitally enabled cafe for students to order drinks, socialize, and study hard. But they need help setting up their menu experience.
+## Getting Started
 
-You have been called on to demonstrate your newly learned skills to create a full stack drink menu application. The application must:
+These instructions will get you a copy of the project up and running on your local machine for development and testing
+purposes.
 
-1) Display graphics representing the ratios of ingredients in each drink.
-2) Allow public users to view drink names and graphics.
-3) Allow the shop baristas to see the recipe information.
-4) Allow the shop managers to create new drinks and edit existing drinks.
+### Prerequisites
 
-## Tasks
+You need the following applications to run the server app:
+1. Python 3.7
+2. Pipenv (_Optional_)
 
-There are `@TODO` comments throughout project. We recommend tackling the sections in order. Start by reading the READMEs in:
+You need the following applications to run the client app:
+1. Node 11+
+2. NPM
 
-1. [`./backend/`](./backend/README.md)
-2. [`./frontend/`](./frontend/README.md)
+### Installing
 
-## About the Stack
+It is preferred if you run this in a virtual environment for python. If you are using `pipenv`, virtual environment
+would be taken care of by `pipenv`. Instructions for setting up a virtual environment for your platform can be found in
+the [python docs](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/).
 
-We started the full stack application for you. It is desiged with some key functional areas:
+Installing the server dependencies:
+1. Change directory to `./backend`.
+2. Install the requirements:
+```bash
+pipenv install
+```
+or if you are not using `pipenv`:
+```bash
+pip install requirements.txt
+```
 
-### Backend
+Installing the client dependencies:
+1. Change directory to `./frontend`.
+2. Install the requirements:
+```bash
+npm i
+```
 
-The `./backend` directory contains a partially completed Flask server with a pre-written SQLAlchemy module to simplify your data needs. You will need to complete the required endpoints, configure, and integrate Auth0 for authentication.
+## Running the application
 
-[View the README.md within ./backend for more details.](./backend/README.md)
+Starting the server:
+1. Change directory to `./backend`.
+2. Run the following commands:
+```bash
+export FLASK_APP=src/api.py
+flask run
+```
+3. The application will be serve on **http://localhost:5000**
 
-### Frontend
+Starting the client:
+1. Change directory to `./frontend`.
+2. Run the following script:
+```bash
+npm run start
+```
+3. The application will be serve on **http://localhost:4200**
 
-The `./frontend` directory contains a complete Ionic frontend to consume the data from the Flask server. You will only need to update the environment variables found within (./frontend/src/environment/environment.ts) to reflect the Auth0 configuration details set up for the backend app. 
+Now, go to **http://localhost:4200** to view the Coffee Shop app.
 
-[View the README.md within ./frontend for more details.](./frontend/README.md)
+## Test Users:
+
+The application uses Auth0 for authenticating users. I have created 2 test users with different roles to test the
+application.
+
+**Barista**
+Username => `barista@coffee-shop.com`
+Password => `Barista@coffee-shop`
+
+**Manager**
+Username => `manager@coffee-shop.com`
+Password => `Manager@coffee-shop`
+
+## Built With
+
+* [Flask](http://flask.pocoo.org/) - The python server micro framework
+* [Angular](https://angular.io/) - The front end MVC framework
+
+## Authors
+
+**Surya Kant Bansal** - *Developer* - [skb1129](https://github.com/skb1129)
+
+## Acknowledgments
+
+* [Udacity](https://www.udacity.com/)
+* [Auth0](https://auth0.com/)
