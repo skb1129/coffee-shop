@@ -57,7 +57,7 @@ def add_drink():
     :json title: string, recipe: dict
     :return: drinks: List containing newly created drink in long format
     """
-    drink = Drink(title=request.json['title'], recipe=json.dumps([request.json['recipe']]))
+    drink = Drink(title=request.json['title'], recipe=json.dumps(request.json['recipe']))
     drink.insert()
     return jsonify({
         'success': True,
