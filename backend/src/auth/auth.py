@@ -60,12 +60,7 @@ def check_permissions(permission, payload):
     :param permission: Required permission
     :param payload: Decoded JWT
     """
-    if 'permissions' not in payload or not payload.get('permissions'):
-        raise AuthError({
-            'code': 'invalid_header',
-            'description': 'Permissions not specified in the token'
-        }, 401)
-    if permission not in payload.get('permissions'):
+    if permission not in payload.get('permissions', []):
         raise AuthError({
             'code': 'unauthorised',
             'description': 'Required permissions not available in the token'
