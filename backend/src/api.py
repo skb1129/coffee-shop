@@ -5,7 +5,7 @@ from flask_cors import CORS
 from werkzeug.exceptions import HTTPException
 
 from .auth.auth import requires_auth, AuthError
-from .database.models import setup_db, Drink
+from .database.models import setup_db, Drink, db_drop_and_create_all
 
 app = Flask(__name__)
 setup_db(app)
@@ -18,7 +18,7 @@ CORS(app)
 '''
 
 
-# db_drop_and_create_all()
+db_drop_and_create_all()
 
 
 # Routes
